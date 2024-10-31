@@ -1,3 +1,7 @@
+CREATE DATABASE Insight
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE Users (
   id UUID DEFAULT uuid_generate_v4(),
   name VARCHAR(255) NOT NULL,
