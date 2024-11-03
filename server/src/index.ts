@@ -3,6 +3,7 @@ import pkg from "pg";
 const { Pool } = pkg;
 import cors from "cors";
 import 'dotenv/config';
+import jwtAuth from "./routes/jwtAuth";
 
 const app = express();
 app.use(cors());
@@ -17,6 +18,8 @@ export const pool = new Pool({
     password: process.env.PG_PASSWORD,
     port: 5432
 });
+
+app.use("/auth", jwtAuth);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

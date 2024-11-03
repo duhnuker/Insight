@@ -8,12 +8,12 @@ interface JwtPayload {
     };
 }
 
-export default (req: Request & { user?: { id: string } }, res: Response, next: NextFunction) => {
-
+export default (req: Request & { user?: { id: string } }, res: Response, next: NextFunction): void => {
     const token = req.header("jwt_token");
 
     if (!token) {
-        return res.status(403).json("Not Authorised");
+        res.status(403).json("Not Authorised");
+        return;
     }
 
     try {
@@ -23,12 +23,15 @@ export default (req: Request & { user?: { id: string } }, res: Response, next: N
 
     } catch (error) {
         if (error instanceof jwt.JsonWebTokenError) {
-            return res.status(403).json({ msg: "Invalid token" });
+            res.status(403).json({ msg: "Invalid token" });
+            return;
         } else if (error instanceof jwt.TokenExpiredError) {
-            return res.status(403).json({ msg: "Token expired" });
+            res.status(403).json({ msg: "Token expired" });
+            return;
         } else {
             console.error((error as Error).message);
-            return res.status(500).json({ msg: "Server error during authentication" });
+            res.status(500).json({ msg: "Server error during authentication" });
+            return;
         }
     }
 };
