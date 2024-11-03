@@ -13,19 +13,17 @@ interface User {
     password: string;
 }
 
-
 //Register
-router.post("/register", validateInfo, async (req: Request, res: Response) => {
-
+router.post("/register", validateInfo, async (req: Request, res: Response): Promise<void> => {
     const { name, email, password } = req.body;
 
     try {
-        
         const user = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
 
         //Check if user already exists
         if (user.rows.length > 0) {
-            return res.status(409).send("User already exists");
+            res.status(409).send("User already exists");
+            return;
         }
 
         //Bcrypt user password
@@ -36,7 +34,8 @@ router.post("/register", validateInfo, async (req: Request, res: Response) => {
         let newUser = await pool.query("INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *", [name, email, bcryptPassword]);
 
         const jwtToken = jwtGenerator(newUser.rows[0].id);
-        return res.json({ jwtToken });
+        res.json({ jwtToken });
+        return;
 
     } catch (error: unknown) {
         if (error instanceof Error) {
@@ -45,40 +44,45 @@ router.post("/register", validateInfo, async (req: Request, res: Response) => {
             console.error("An unknown error occurred");
         }
         res.status(500).send("Server Error");
+        return;
     }
-
 });
-router.post("/login", validateInfo, async (req: Request, res: Response) => {
+
+router.post("/login", validateInfo, async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body as { email: string; password: string };
 
     try {
-        
         const user = await pool.query<User>("SELECT * FROM users WHERE email = $1", [email]);
 
         if (user.rows.length === 0) {
-            return res.status(401).json("Password or Email is incorrect");
+            res.status(401).json("Password or Email is incorrect");
+            return;
         }
 
         // Check if incoming password is correct
         const validPassword = await bcrypt.compare(password, user.rows[0].password);
         if (!validPassword) {
-            return res.status(401).json("Password or Email is incorrect");
+            res.status(401).json("Password or Email is incorrect");
+            return;
         }
 
         // Give them the JWT token
         const jwtToken = jwtGenerator(user.rows[0].id);
-        return res.json({ jwtToken });
+        res.json({ jwtToken });
+        return;
 
     } catch (error) {
         console.error((error as Error).message);
         res.status(500).send("Server Error");
+        return;
     }
 });
 
-router.post("/verify", authorise, async (req: Request, res: Response) => {
+router.post("/verify", authorise, async (req: Request, res: Response): Promise<void> => {
     try {
         res.json(true);
         console.error("User verified");
+        return;
     } catch (error: unknown) {
         if (error instanceof Error) {
             console.error(error.message);
@@ -86,6 +90,7 @@ router.post("/verify", authorise, async (req: Request, res: Response) => {
             console.error('An unknown error occurred');
         }
         res.status(500).send("Server Error");
+        return;
     }
 });
 
