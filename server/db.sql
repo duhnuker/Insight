@@ -16,6 +16,7 @@ CREATE TABLE Profile (
     id SERIAL PRIMARY KEY,
     user_id UUID REFERENCES Users(id),
     name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE,
     skills TEXT,
     experience TEXT,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,

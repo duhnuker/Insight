@@ -15,7 +15,7 @@ interface User {
 
 //Register
 router.post("/register", validateInfo, async (req: Request, res: Response): Promise<void> => {
-    const { name, email, password } = req.body;
+    const { name, email, password, skills, experience } = req.body;
 
     try {
         const user = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
@@ -32,6 +32,9 @@ router.post("/register", validateInfo, async (req: Request, res: Response): Prom
 
         //Add new user to database
         let newUser = await pool.query("INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *", [name, email, bcryptPassword]);
+
+        //Create profile for the new user
+        await pool.query("INSERT INTO profile (user_id, name, email, skills, experience) VALUES ($1, $2, $3, $4, $5)",[newUser.rows[0].id, name, email, skills, experience]);
 
         const jwtToken = jwtGenerator(newUser.rows[0].id);
         res.json({ jwtToken });
