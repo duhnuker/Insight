@@ -1,4 +1,4 @@
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import axios from "axios";
 import Landing from "./pages/Landing";
@@ -8,6 +8,10 @@ import Login from "./pages/Login";
 function App() {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const setAuth = (boolean: boolean) => {
+    setIsAuthenticated(boolean);
+  };
 
   const checkAuthenticated = async () => {
     try {
@@ -33,11 +37,14 @@ function App() {
   }, []);
 
   return (
-    <Router>
+    <Router future={{
+      v7_startTransition: true,
+      v7_relativeSplatPath: true
+    }}>
       <Routes>
         <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/userHome" />} />
-        <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/userHome" />}></Route>
-        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/userHome" />}></Route>
+        <Route path="/register" element={!isAuthenticated ? <Register setAuth={setAuth} /> : <Navigate to="/userHome" />}></Route>
+        <Route path="/login" element={!isAuthenticated ? <Login setAuth={setAuth} /> : <Navigate to="/userHome" />}></Route>
       </Routes>
     </Router>
   )
