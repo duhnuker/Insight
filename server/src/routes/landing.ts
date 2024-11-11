@@ -15,7 +15,7 @@ router.get("/", async (req: Request, res: Response) => {
         const params = {
             app_id: APP_ID,
             app_key: APP_KEY,
-            results_per_page: 15
+            results_per_page: 10
         };
 
         const headers = {
@@ -31,6 +31,5 @@ router.get("/", async (req: Request, res: Response) => {
         res.status(500).json({ error: "Error fetching job listings" });
     }
 });
-
 
 export default router;
