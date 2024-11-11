@@ -5,19 +5,21 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
     const [inputs, setInputs] = useState({
         email: "",
         password: "",
-        name: ""
+        name: "",
+        skills: "",
+        experience: ""
     });
 
-    const { email, password, name } = inputs;
+    const { email, password, name, skills, experience } = inputs;
 
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setInputs({ ...inputs, [e.target.name]: e.target.value });
     };
 
     const onSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const body = { email, password, name };
+            const body = { email, password, name, skills, experience };
             const response = await axios.post("http://localhost:5000/auth/register",
                 body,
                 {
@@ -66,6 +68,20 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
                         name='password'
                         placeholder='Password'
                         value={password}
+                        onChange={onChange}
+                    />
+                    <textarea
+                        className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent transition"
+                        name='skills'
+                        placeholder='Your Skills (e.g., JavaScript, React, Node.js)'
+                        value={skills}
+                        onChange={onChange}
+                    />
+                    <textarea
+                        className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent transition"
+                        name='experience'
+                        placeholder='Your Experience'
+                        value={experience}
                         onChange={onChange}
                     />
                     <button
