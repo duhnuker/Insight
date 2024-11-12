@@ -4,6 +4,7 @@ import axios from "axios";
 import Landing from "./pages/Landing";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import UserHome from "./pages/UserHome";
 
 function App() {
 
@@ -42,9 +43,11 @@ function App() {
       v7_relativeSplatPath: true
     }}>
       <Routes>
-        <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/userHome" />} />
+        <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/userHome" />}></Route>
         <Route path="/register" element={!isAuthenticated ? <Register setAuth={setAuth} /> : <Navigate to="/userHome" />}></Route>
         <Route path="/login" element={!isAuthenticated ? <Login setAuth={setAuth} /> : <Navigate to="/userHome" />}></Route>
+        <Route path="/userHome" element={isAuthenticated ? <UserHome /> : <Navigate to="/" />} />
+
       </Routes>
     </Router>
   )
