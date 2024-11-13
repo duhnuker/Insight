@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import NavBar from '../components/NavBar';
 
 interface Job {
   id: string;
@@ -33,6 +34,9 @@ const Landing = () => {
         <div className='text-center py-6 text-white font-medium italic'>
           Giving you the insight into your next career
         </div>
+      </div>
+      <div className='flex justify-center pb-4'>
+        <NavBar />
       </div>
       <div className='allListings px-4 md:px-8 max-w-2xl mx-auto space-y-4'>
         {Array.isArray(jobs) && jobs.map((job) => (

@@ -5,6 +5,7 @@ import Landing from "./pages/Landing";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import UserHome from "./pages/UserHome";
+import Profile from "./pages/Profile";
 
 function App() {
 
@@ -46,9 +47,9 @@ function App() {
         <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/userHome" />}></Route>
         <Route path="/register" element={!isAuthenticated ? <Register setAuth={setAuth} /> : <Navigate to="/userHome" />}></Route>
         <Route path="/login" element={!isAuthenticated ? <Login setAuth={setAuth} /> : <Navigate to="/userHome" />}></Route>
-        <Route path="/userHome" element={isAuthenticated ? <UserHome /> : <Navigate to="/" />} />
-
-      </Routes>
+        <Route path="/userHome" element={!isAuthenticated ? <Landing /> : <UserHome />}></Route>
+        <Route path="/profile" element={!isAuthenticated ? <Landing /> : <Profile />}></Route>
+        </Routes>
     </Router>
   )
 }

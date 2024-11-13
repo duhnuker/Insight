@@ -21,7 +21,6 @@ const UserHome = () => {
         headers: { jwt_token: localStorage.token }
       });
 
-      console.log("Client response data:", response.data);
       setName(response.data.name);
       setRecommendedJob(response.data.recommendedJob);
 

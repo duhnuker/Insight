@@ -1,6 +1,6 @@
 import express, { Request, Response, Router } from "express";
-import { pool } from "../index";
-import authorise from "../middleware/authorise";
+import { pool } from "../index.js";
+import authorise from "../middleware/authorise.js";
 
 const router: Router = express.Router();
 
