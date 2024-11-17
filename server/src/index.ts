@@ -7,6 +7,7 @@ import jwtAuth from "./routes/jwtAuth.js";
 import landing from "./routes/landing.js";
 import userHome from "./routes/userHome.js";
 import profile from "./routes/profile.js";
+import resumeBuilder from "./routes/resumeBuilder.js";
 
 const app = express();
 app.use(cors({
@@ -29,6 +30,7 @@ app.use("/auth", jwtAuth);
 app.use("/api/landing", landing);
 app.use("/api/userhome", userHome);
 app.use("/api/profile", profile);
+app.use("/resumeBuilder", resumeBuilder);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
