@@ -44,10 +44,12 @@ CREATE TABLE Recommendations (
 
 CREATE TABLE Resume_Uploads (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
+    user_id UUID REFERENCES Users(id),
     filename VARCHAR(255),
     status VARCHAR(50),
     analysis JSONB,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
+
 
