@@ -41,3 +41,13 @@ CREATE TABLE Recommendations (
     score FLOAT CHECK (score >= 0 AND score <= 1),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE Resume_Uploads (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    filename VARCHAR(255),
+    status VARCHAR(50),
+    analysis JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
