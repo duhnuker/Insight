@@ -28,10 +28,10 @@ const Landing = () => {
   }, []);
 
   return (
-    <div className='min-h-screen bg-gray-600 flex-col justify-center pb-4'>
+    <div className='min-h-screen bg-gradient-to-tr from-slate-900 via-emerald-900 to-green-700 flex-col justify-center pb-4'>
       <div className='p-8 rounded-lg shadow-lg text-center mb-4'>
-        <h1 className='text-3xl font-bold text-white mb-8'>Insight</h1>
-        <div className='text-center py-6 text-white font-medium italic'>
+        <h1 className='text-6xl font-bold text-white'>Insight</h1>
+        <div className='text-center pt-8 text-emerald-100 font-medium italic'>
           Giving you the insight into your next career
         </div>
       </div>
@@ -40,16 +40,16 @@ const Landing = () => {
       </div>
       <div className='allListings px-4 md:px-8 max-w-2xl mx-auto space-y-4'>
         {Array.isArray(jobs) && jobs.map((job) => (
-          <div key={job.id} className='bg-gray-500 p-8 rounded-lg shadow-lg'>
+          <div key={job.id} className='bg-slate-800/80 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-emerald-800/30 hover:border-emerald-700/50 transition-all duration-300'>
             <h2 className='text-xl font-bold text-white mb-2'>{job.title}</h2>
-            <p className='text-white mb-2'>{job.company.display_name}</p>
-            <p className='text-white mb-2'>{job.location.display_name}</p>
-            <p className='text-white mb-4'>{job.description.slice(0, 150)}...</p>
+            <p className='text-emerald-200 mb-2'>{job.company.display_name}</p>
+            <p className='text-emerald-200 mb-2'>{job.location.display_name}</p>
+            <p className='text-slate-300 mb-4'>{job.description.slice(0, 150)}...</p>
             <a
               href={job.redirect_url}
               target='_blank'
               rel='noopener noreferrer'
-              className='w-full bg-lime-600 text-white py-3 rounded-md hover:bg-lime-600 transition duration-200 font-medium inline-block text-center'
+              className='w-full bg-emerald-700 text-white py-3 rounded-md hover:bg-emerald-600 hover:shadow-lg transition duration-300 font-medium inline-block text-center'
             >
               Apply Now
             </a>
