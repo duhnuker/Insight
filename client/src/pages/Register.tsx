@@ -42,12 +42,15 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-600 flex justify-center items-center">
-            <div className="bg-gray-500 p-8 rounded-lg shadow-lg w-full max-w-md">
-                <h1 className="text-3xl font-bold text-white mb-8 text-center">Register</h1>
+        <div className="min-h-screen bg-gradient-to-tr from-slate-900 via-emerald-900 to-green-700 flex justify-center items-center">
+            <div className="bg-slate-800/80 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-emerald-800/30 hover:border-emerald-700/50 transition-all duration-300 w-full max-w-md">
+                <h1 className="text-6xl font-bold text-white mb-8 text-center">Insight</h1>
+                <div className="text-center pb-8 text-emerald-100 font-medium italic">
+                    Start your journey with us
+                </div>
                 <form onSubmit={onSubmitForm} className="space-y-6">
                     <input
-                        className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent transition"
+                        className="w-full px-4 py-3 rounded-md border border-emerald-800/30 bg-slate-700/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition"
                         type='text'
                         name='name'
                         placeholder='Full Name'
@@ -55,7 +58,7 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
                         onChange={onChange}
                     />
                     <input
-                        className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent transition"
+                        className="w-full px-4 py-3 rounded-md border border-emerald-800/30 bg-slate-700/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition"
                         type='text'
                         name='email'
                         placeholder='Email'
@@ -63,7 +66,7 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
                         onChange={onChange}
                     />
                     <input
-                        className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent transition"
+                        className="w-full px-4 py-3 rounded-md border border-emerald-800/30 bg-slate-700/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition"
                         type='password'
                         name='password'
                         placeholder='Password'
@@ -71,14 +74,14 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
                         onChange={onChange}
                     />
                     <textarea
-                        className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent transition"
+                        className="w-full px-4 py-3 rounded-md border border-emerald-800/30 bg-slate-700/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition"
                         name='skills'
                         placeholder='Your Skills (e.g., JavaScript, React, Node.js)'
                         value={skills}
                         onChange={onChange}
                     />
                     <textarea
-                        className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent transition"
+                        className="w-full px-4 py-3 rounded-md border border-emerald-800/30 bg-slate-700/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition"
                         name='experience'
                         placeholder='Your Experience'
                         value={experience}
@@ -86,7 +89,7 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
                     />
                     <button
                         type="submit"
-                        className="w-full bg-lime-600 text-white py-3 rounded-md hover:bg-lime-600 transition duration-200 font-medium"
+                        className="w-full bg-emerald-700 text-white py-3 rounded-md hover:bg-emerald-600 hover:shadow-lg transition duration-300 font-medium"
                     >
                         Register
                     </button>
