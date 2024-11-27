@@ -29,50 +29,49 @@ const Profile = () => {
     }, []);
 
     return (
-        <div className='min-h-screen bg-gray-600 flex-col justify-center pb-4'>
+        <div className='min-h-screen bg-gradient-to-tr from-slate-900 via-emerald-900 to-green-700 flex-col justify-center pb-4'>
             <div className='p-8 rounded-lg shadow-lg text-center mb-4'>
-                <h1 className='text-3xl font-bold text-white mb-8'>Insight</h1>
-                <h2 className="text-xl mb-4 text-white">Welcome {name}!</h2>
-                <div className='text-center py-6 text-white font-medium italic'>
+                <h1 className='text-6xl font-bold text-white'>Insight</h1>
+                <div className='text-center pt-8 text-emerald-100 font-medium italic'>
                     Giving you the insight into your next career
                 </div>
             </div>
             <div className='flex justify-center pb-4'>
-                <NavBar />
+                <NavBar isAuthenticated={true} />
             </div>
             <div className='px-4 md:px-8 max-w-2xl mx-auto space-y-4'>
-                <h3 className='text-xl font-semibold mb-4 text-center text-white'>Your Profile</h3>
-                <div className='bg-gray-500 p-8 rounded-lg shadow-lg'>
+                <h3 className='text-3xl font-semibold my-10 text-center text-emerald-100'>Your Profile</h3>
+                <div className='bg-slate-800/80 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-emerald-800/30 hover:border-emerald-700/50 transition-all duration-300'>
                     <div className='space-y-4'>
                         <h4 className='text-white font-bold'>Full Name</h4>
                         <input
                             placeholder="Name"
                             value={name}
-                            className="w-full p-3 rounded border border-gray-300"
+                            className="w-full p-3 rounded border border-emerald-700 bg-slate-700/50 text-white"
                         />
                         <h4 className='text-white font-bold'>Email</h4>
                         <input
                             placeholder="Email"
                             value={email}
-                            className="w-full p-3 rounded border border-gray-300"
+                            className="w-full p-3 rounded border border-emerald-700 bg-slate-700/50 text-white"
                         />
                         <h4 className='text-white font-bold'>Skills</h4>
                         <input
                             placeholder="Skills"
                             value={skills}
-                            className="w-full p-3 rounded border border-gray-300"
+                            className="w-full p-3 rounded border border-emerald-700 bg-slate-700/50 text-white"
                         />
                         <h4 className='text-white font-bold'>Experience</h4>
                         <input
                             placeholder="Experience"
                             value={experience}
-                            className="w-full p-3 rounded border border-gray-300"
+                            className="w-full p-3 rounded border border-emerald-700 bg-slate-700/50 text-white"
                         />
                         <div className='flex justify-center space-x-4 mt-6'>
-                            <button className='bg-lime-600 text-white py-3 px-6 rounded-md hover:bg-lime-700 transition duration-200 font-medium'>
+                            <button className='bg-emerald-700 text-white py-3 px-6 rounded-md hover:bg-emerald-600 hover:shadow-lg transition duration-300 font-medium'>
                                 Save Changes
                             </button>
-                            <button className='bg-red-600 text-white py-3 px-6 rounded-md hover:bg-red-700 transition duration-200 font-medium'>
+                            <button className='bg-red-700 text-white py-3 px-6 rounded-md hover:bg-red-800 hover:shadow-lg transition duration-300 font-medium'>
                                 Delete Profile
                             </button>
                         </div>
