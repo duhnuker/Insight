@@ -36,9 +36,16 @@ async function getJobRecommendations(userProfile: string, jobs: any[]) {
 
     const jobDescriptions = jobs.map(job => job.description);
     const result = await classifier(userProfile, jobDescriptions) as ZeroShotOutput;
-    const topMatchIndex = result.scores.indexOf(Math.max(...result.scores));
 
-    return jobs[topMatchIndex];
+    // Get top 3 matches
+    const scores = [...result.scores];
+    const topThreeIndices = scores
+        .map((score, index) => ({ score, index }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3)
+        .map(item => item.index);
+
+    return topThreeIndices.map(index => jobs[index]);
 }
 
 
@@ -65,8 +72,9 @@ router.get("/", authorise, async (req: Request & { user?: { id: string } }, res:
         // Send both user data and recommended job
         res.json({
             name: userData.rows[0].name,
-            recommendedJob
+            recommendedJobs: recommendedJob
         });
+        
 
     } catch (error: unknown) {
         console.error(error instanceof Error ? error.message : "Unknown error");
