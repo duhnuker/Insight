@@ -94,24 +94,27 @@ router.get("/analysis/:id", authorise, async (req: Request & { user?: { id: stri
       return;
     }
 
-    // Extract text
     const resumeText = await textractFromFile(filePath);
 
-    // Add this after extracting text
-    const prompt = `Analyze this resume and provide specific improvements:
+    const prompt = `Analyze this resume and provide a clear, structured analysis with specific recommendations:
+
+    Resume Text:
     ${resumeText}
-    Focus on:
-    1. Format and structure
-    2. Content strength
-    3. Professional impact
-    4. Keywords and skills`;
+
+    Please provide specific feedback in these areas:
+    - Format & Structure: Evaluate the layout and organization
+    - Content Quality: Assess the descriptions and achievements
+    - Professional Impact: Review how effectively experience is communicated
+    - Key Skills: Identify important skills and suggest additions`;
 
     const response = await hf.textGeneration({
-      model: "google/flan-t5-base",
+      model: "tiiuae/falcon-7b-instruct",
       inputs: prompt,
       parameters: {
-        max_length: 500,
-        temperature: 0.7
+        max_length: 800,
+        temperature: 0.3,
+        top_p: 0.9,
+        repetition_penalty: 1.2
       }
     });
 
