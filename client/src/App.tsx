@@ -6,6 +6,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import UserHome from "./pages/UserHome";
 import Profile from "./pages/Profile";
+import ResumeBuilder from "./pages/ResumeBuilder";
 
 function App() {
 
@@ -49,6 +50,7 @@ function App() {
         <Route path="/login" element={!isAuthenticated ? <Login setAuth={setAuth} /> : <Navigate to="/userHome" />}></Route>
         <Route path="/userHome" element={!isAuthenticated ? <Landing /> : <UserHome />}></Route>
         <Route path="/profile" element={!isAuthenticated ? <Landing /> : <Profile />}></Route>
+        <Route path="/resumeBuilder" element={!isAuthenticated ? <Landing /> : <ResumeBuilder />}></Route>
         </Routes>
     </Router>
   )

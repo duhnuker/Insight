@@ -32,7 +32,7 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024
   },
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['.doc', '.docx'];
+    const allowedTypes = ['.pdf'];
     const ext = path.extname(file.originalname).toLowerCase();
     if (allowedTypes.includes(ext)) {
       cb(null, true);
@@ -46,7 +46,7 @@ const upload = multer({
 router.post("/upload", authorise, upload.single('resume'), async (req: Request & { user?: { id: string } }, res: Response): Promise<void> => {
   try {
     if (!req.file) {
-      res.status(400).json({ error: 'Please upload a valid .doc or .docx file' });
+      res.status(400).json({ error: 'Please upload a valid file' });
       return;
     }
 
@@ -55,19 +55,20 @@ router.post("/upload", authorise, upload.single('resume'), async (req: Request &
       return;
     }
 
+    const filePath = path.join('./uploads/', req.file.filename);
+
     const { rows } = await pool.query(
       'INSERT INTO resume_uploads (user_id, filename, status) VALUES ($1, $2, $3) RETURNING id',
-      [req.user.id, req.file.filename, 'pending']
+      [req.user.id, filePath, 'pending']
     );
 
     res.json({ id: rows[0].id });
   } catch (error) {
     console.error('Upload error:', error);
-    res.status(500).json({ 
-      error: 'Upload failed. Please ensure your file is a valid .doc or .docx document under 5MB'
-    });
+    res.status(500).json({ error: 'Upload failed' });
   }
 });
+
 
 
 router.get("/analysis/:id", authorise, async (req: Request & { user?: { id: string } }, res: Response): Promise<void> => {
@@ -87,7 +88,8 @@ router.get("/analysis/:id", authorise, async (req: Request & { user?: { id: stri
       return;
     }
 
-    const filePath = path.join('./uploads/', rows[0].filename);
+    const filePath = rows[0].filename;
+    console.log('Analyzing file:', filePath);
 
     if (!fs.existsSync(filePath)) {
       res.status(404).json({ error: 'Resume file not found' });
@@ -95,6 +97,7 @@ router.get("/analysis/:id", authorise, async (req: Request & { user?: { id: stri
     }
 
     const resumeText = await textractFromFile(filePath);
+    console.log('Successfully extracted text from PDF');
 
     const prompt = `Analyze this resume and provide a clear, structured analysis with specific recommendations:
 
@@ -130,17 +133,20 @@ router.get("/analysis/:id", authorise, async (req: Request & { user?: { id: stri
 
     res.json({ analysis: response.generated_text });
 
-
-
   } catch (error) {
-    console.error('Analysis error:', error);
-    res.status(500).json({ error: 'Analysis failed' });
+    console.error('Detailed analysis error:', error);
+    if (error instanceof Error) {
+      res.status(500).json({ error: `Analysis failed: ${error.message}` });
+    } else {
+      res.status(500).json({ error: 'Analysis failed' });
+    }
   }
 });
 
 
 router.get("/file/:id", authorise, async (req: Request & { user?: { id: string } }, res: Response): Promise<void> => {
   try {
+
     if (!req.user) {
       res.status(401).json({ error: 'Unauthorized' });
       return;
@@ -156,12 +162,20 @@ router.get("/file/:id", authorise, async (req: Request & { user?: { id: string }
       return;
     }
 
-    const filePath = path.join('./uploads/', rows[0].filename);
-    res.sendFile(filePath);
+    const filePath = rows[0].filename;
+    
+    if (!fs.existsSync(filePath)) {
+      res.status(404).json({ error: 'File not found on server' });
+      return;
+    }
+
+    res.sendFile(path.resolve(filePath));
   } catch (error) {
+    console.error('File retrieval error:', error);
     res.status(500).json({ error: 'File retrieval failed' });
   }
 });
+
 
 
 export default router;
