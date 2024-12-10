@@ -121,7 +121,10 @@ router.get("/analysis/:id", authorise, async (req: Request & { user?: { id: stri
       }
     });
 
-    const outputOnly = response.generated_text.split("Key Skills: Identify important skills and suggest additions or improvements")[1].trim();
+    let outputOnly = response.generated_text;
+    if (response.generated_text.includes("suggest additions")) {
+      outputOnly = response.generated_text.split("suggest additions")[1]?.trim() || response.generated_text;
+    }
 
     const analysisData = {
       content: outputOnly,
@@ -165,7 +168,7 @@ router.get("/file/:id", authorise, async (req: Request & { user?: { id: string }
     }
 
     const filePath = rows[0].filename;
-    
+
     if (!fs.existsSync(filePath)) {
       res.status(404).json({ error: 'File not found on server' });
       return;
