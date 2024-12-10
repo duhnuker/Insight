@@ -121,8 +121,10 @@ router.get("/analysis/:id", authorise, async (req: Request & { user?: { id: stri
       }
     });
 
+    const outputOnly = response.generated_text.split("Key Skills: Identify important skills and suggest additions or improvements")[1].trim();
+
     const analysisData = {
-      content: response.generated_text,
+      content: outputOnly,
       timestamp: new Date().toISOString()
     };
 
@@ -131,7 +133,7 @@ router.get("/analysis/:id", authorise, async (req: Request & { user?: { id: stri
       [analysisData, 'completed', req.params.id]
     );
 
-    res.json({ analysis: response.generated_text });
+    res.json({ analysis: outputOnly });
 
   } catch (error) {
     console.error('Detailed analysis error:', error);
