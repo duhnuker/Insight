@@ -10,6 +10,7 @@ const ResumeBuilder = () => {
   const [isAnalysing, setIsAnalysing] = useState(false);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [uploadedFileId, setUploadedFileId] = useState<string | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -42,8 +43,10 @@ const ResumeBuilder = () => {
 
       const { id } = uploadResponse.data;
       setUploadedFileId(id);
+      setUploadSuccess(true);  // Add this line
     } catch (error: unknown) {
       setError("Upload failed. Please try again.");
+      setUploadSuccess(false);
     } finally {
       setIsUploading(false);
     }
@@ -124,10 +127,10 @@ const ResumeBuilder = () => {
 
           <button
             onClick={uploadResume}
-            disabled={!file || isUploading}
+            disabled={!file || isUploading || uploadSuccess}
             className='w-full bg-emerald-700 text-white py-3 rounded-md hover:bg-emerald-600 hover:shadow-lg transition duration-300 font-medium cursor-pointer mb-4'
           >
-            {isUploading ? 'Uploading...' : 'Upload Resume'}
+            {isUploading ? 'Uploading...' : uploadSuccess ? 'Resume Uploaded Successfully!' : 'Upload Resume'}
           </button>
 
           <button
@@ -163,12 +166,12 @@ const ResumeBuilder = () => {
                   </object>
                 </div>
               )}
-              
+
               {analysis && (
                 <div className="col-span-1">
                   <div className="bg-slate-800/80 backdrop-blur-sm p-6 rounded-lg h-full">
                     <h2 className="text-xl font-bold text-white mb-4">AI Analysis Results:</h2>
-                    <div className="text-emerald-200 whitespace-pre-line space-y-4">
+                    <div className="text-emerald-200 whitespace-pre-line space-y- text-xl">
                       {typeof analysis === 'string'
                         ? analysis.split('\n').map((line, index) => (
                           <p key={index} className="leading-relaxed">
