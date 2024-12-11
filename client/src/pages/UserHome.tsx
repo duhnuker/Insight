@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavBar from '../components/NavBar';
 
@@ -13,7 +13,7 @@ interface RecommendedJob {
 
 const UserHome = () => {
   const [name, setName] = useState("");
-  const [recommendedJob, setRecommendedJob] = useState<RecommendedJob | null>(null);
+  const [recommendedJobs, setRecommendedJobs] = useState<RecommendedJob[]>([]);
 
   const getProfile = async () => {
     try {
@@ -22,14 +22,12 @@ const UserHome = () => {
       });
 
       setName(response.data.name);
-      setRecommendedJob(response.data.recommendedJob);
+      setRecommendedJobs(response.data.recommendedJobs);
 
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("Error details:", error.message);
-      } else {
-        console.error("An unknown error occurred");
-      }
+      console.error("An unknown error occurred");
+      localStorage.removeItem("token");
+      window.location.href = '/';
     }
   };
 
@@ -47,21 +45,21 @@ const UserHome = () => {
         </div>
       </div>
       <div className='flex justify-center pb-4'>
-        <NavBar />
+        <NavBar isAuthenticated={true} />
       </div>
       <div className='allListings px-4 md:px-8 max-w-2xl mx-auto space-y-4'>
-        <h3 className='text-xl font-semibold mb-4 text-center text-emerald-100'>AI-Matched Job Opportunity</h3>
-        {recommendedJob && (
-          <div className='bg-slate-800/80 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-emerald-800/30 hover:border-emerald-700/50 transition-all duration-300'>
-            <h2 className='text-xl font-bold text-white mb-2'>{recommendedJob.title}</h2>
-            <p className='text-emerald-200 mb-2'>{recommendedJob.company.display_name}</p>
-            <p className='text-emerald-200 mb-2'>{recommendedJob.location.display_name}</p>
-            {recommendedJob.salary_min && (
-              <p className='text-emerald-200 mb-2'>Salary: ${recommendedJob.salary_min.toLocaleString()}</p>
+        <h3 className='text-3xl font-semibold my-10 text-center text-emerald-100'>AI-Matched Job Opportunities</h3>
+        {recommendedJobs.map((job, index) => (
+          <div key={index} className='bg-slate-800/80 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-emerald-800/30 hover:border-emerald-700/50 transition-all duration-300 motion-preset-expand mb-4'>
+            <h2 className='text-xl font-bold text-white mb-2'>{job.title}</h2>
+            <p className='text-emerald-200 mb-2'>{job.company.display_name}</p>
+            <p className='text-emerald-200 mb-2'>{job.location.display_name}</p>
+            {job.salary_min && (
+              <p className='text-emerald-200 mb-2'>Salary: ${job.salary_min.toLocaleString()}</p>
             )}
-            <p className='text-slate-300 mb-4'>{recommendedJob.description.slice(0, 150)}...</p>
+            <p className='text-slate-300 mb-4'>{job.description.slice(0, 150)}...</p>
             <a
-              href={recommendedJob.redirect_url}
+              href={job.redirect_url}
               target='_blank'
               rel='noopener noreferrer'
               className='w-full bg-emerald-700 text-white py-3 rounded-md hover:bg-emerald-600 hover:shadow-lg transition duration-300 font-medium inline-block text-center'
@@ -69,10 +67,10 @@ const UserHome = () => {
               Apply Now
             </a>
           </div>
-        )}
+        ))}
       </div>
+
     </div>
   );
 };
-
 export default UserHome;
