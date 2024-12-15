@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios';
 import NavBar from '../components/NavBar';
 
@@ -6,7 +6,7 @@ const Profile = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [skills, setSkills] = useState("");
-    const [experience, setExperience] = useState("");
+    const [experiences, setExperiences] = useState([{ value: "" }]);
 
     const getProfile = async () => {
         try {
@@ -17,11 +17,26 @@ const Profile = () => {
             setName(response.data.name);
             setEmail(response.data.email);
             setSkills(response.data.skills);
-            setExperience(response.data.experience);
+            setExperiences([{ value: response.data.experience }]);
 
         } catch (error: unknown) {
             console.error("An unknown error occurred");
         }
+    };
+
+    const handleExperienceChange = (index: number, value: string) => {
+        const newExperiences = [...experiences];
+        newExperiences[index].value = value;
+        setExperiences(newExperiences);
+    };
+
+    const addExperienceField = () => {
+        setExperiences([...experiences, { value: "" }]);
+    };
+
+    const removeExperienceField = (index: number) => {
+        const newExperiences = experiences.filter((_, i) => i !== index);
+        setExperiences(newExperiences);
     };
 
     useEffect(() => {
@@ -39,8 +54,8 @@ const Profile = () => {
             <div className='flex justify-center pb-4'>
                 <NavBar isAuthenticated={true} />
             </div>
-            <div className='px-4 md:px-8 max-w-2xl mx-auto space-y-4'>
-                <h3 className='text-3xl font-semibold my-10 text-center text-emerald-100'>Your Profile</h3>
+            <div className='px-4 md:px-8 max-w-2xl mx-auto space-y-4 motion-scale-in-[0.5] motion-translate-x-in-[-1%] motion-translate-y-in-[42%] motion-opacity-in-[0%] motion-blur-in-[5px] motion-duration-[1.00s] motion-duration-[1.50s]/scale motion-duration-[1.50s]/translate'>
+                <h3 className='text-3xl font-semibold mt-10 text-center text-emerald-100'>Your Profile</h3>
                 <div className='bg-slate-800/80 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-emerald-800/30 hover:border-emerald-700/50 transition-all duration-300'>
                     <div className='space-y-4'>
                         <h4 className='text-white font-bold'>Full Name</h4>
@@ -56,25 +71,36 @@ const Profile = () => {
                             className="w-full p-3 rounded border border-emerald-700 bg-slate-700/50 text-white"
                         />
                         <h4 className='text-white font-bold'>Skills</h4>
-                        <input
+                        <textarea
                             placeholder="Skills"
                             value={skills}
-                            className="w-full p-3 rounded border border-emerald-700 bg-slate-700/50 text-white"
+                            className="w-full h-[150px] p-3 rounded border border-emerald-700 bg-slate-700/50 text-white align-top"
                         />
                         <h4 className='text-white font-bold'>Experience</h4>
-                        <input
-                            placeholder="Experience"
-                            value={experience}
-                            className="w-full p-3 rounded border border-emerald-700 bg-slate-700/50 text-white"
-                        />
-                        <div className='flex justify-center space-x-4 mt-6'>
-                            <button className='bg-emerald-700 text-white py-3 px-6 rounded-md hover:bg-emerald-600 hover:shadow-lg transition duration-300 font-medium'>
-                                Save Changes
-                            </button>
-                            <button className='bg-red-700 text-white py-3 px-6 rounded-md hover:bg-red-800 hover:shadow-lg transition duration-300 font-medium'>
-                                Delete Profile
-                            </button>
-                        </div>
+                        {experiences.map((exp, index) => (
+                            <div key={index} className="flex gap-2">
+                                <input
+                                    placeholder="Experience"
+                                    value={exp.value}
+                                    onChange={(e) => handleExperienceChange(index, e.target.value)}
+                                    className="w-full p-3 rounded border border-emerald-700 bg-slate-700/50 text-white align-top"
+                                />
+                                {experiences.length > 1 && (
+                                    <button
+                                        onClick={() => removeExperienceField(index)}
+                                        className="h-12 px-4 bg-red-700 text-white rounded-md hover:bg-red-800 transition duration-300"
+                                    >
+                                        X
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                        <button
+                            onClick={addExperienceField}
+                            className="mt-2 px-4 py-2 bg-emerald-700 text-white rounded-md hover:bg-emerald-600 transition duration-300"
+                        >
+                            + Add Experience
+                        </button>
                     </div>
                 </div>
             </div>
