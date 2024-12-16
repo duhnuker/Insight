@@ -50,12 +50,12 @@ router.put("/", authorise, async (req: Request & { user?: { id: string } }, res:
         if (profileExists.rows.length > 0) {
             await pool.query(
                 "UPDATE profile SET name = $1, email = $2, skills = $3::text[], experience = $4::text[], updated_at = CURRENT_TIMESTAMP WHERE user_id = $5",
-                [name, email, skills, experience, req.user.id]
+                [name, email, skillsArray, experienceArray, req.user.id]
             );
         } else {
             await pool.query(
                 "INSERT INTO profile (user_id, name, email, skills, experience) VALUES ($1, $2, $3, $4::text[], $5::text[])",
-                [req.user.id, name, email, skills, experience]
+                [req.user.id, name, email, skillsArray, experienceArray]
             );
         }
 
@@ -79,11 +79,11 @@ router.delete("/:id", authorise, async (req: Request & { user?: { id: string } }
 
         const { id } = req.params;
 
-        await pool.query("DELETE FROM recommendations WHERE user_id = $1", [req.user.id]);
+        await pool.query("DELETE FROM recommendations WHERE user_id = $1", [id]);
 
-        await pool.query("DELETE FROM profile WHERE user_id = $1", [req.user.id]);
+        await pool.query("DELETE FROM profile WHERE user_id = $1", [id]);
 
-        const deleteUser = await pool.query("DELETE FROM users WHERE id = $1 RETURNING *", [req.user.id]);
+        const deleteUser = await pool.query("DELETE FROM users WHERE id = $1 RETURNING *", [id]);
 
         if (deleteUser.rows.length === 0) {
             res.json("The user does not exist!");

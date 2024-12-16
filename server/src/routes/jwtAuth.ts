@@ -33,8 +33,14 @@ router.post("/register", validateInfo, async (req: Request, res: Response): Prom
         //Add new user to database
         let newUser = await pool.query("INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *", [name, email, bcryptPassword]);
 
+        const skillsArray = Array.isArray(skills) ? skills : skills.split(',').map((s: string) => s.trim());
+        const experienceArray = Array.isArray(experience) ? experience : experience.split(',').map((e: string) => e.trim());
+
         //Create profile for the new user
-        await pool.query("INSERT INTO profile (user_id, name, email, skills, experience) VALUES ($1, $2, $3, $4, $5)",[newUser.rows[0].id, name, email, skills, experience]);
+        await pool.query(
+            "INSERT INTO profile (user_id, name, email, skills, experience) VALUES ($1, $2, $3, $4::text[], $5::text[])",
+            [newUser.rows[0].id, name, email, skillsArray, experienceArray]
+        );
 
         const jwtToken = jwtGenerator(newUser.rows[0].id);
         res.json({ jwtToken });

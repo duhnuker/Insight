@@ -48,7 +48,7 @@ const UserHome = () => {
         <NavBar isAuthenticated={true} />
       </div>
       <div className='allListings px-4 md:px-8 max-w-2xl mx-auto space-y-4'>
-        <h3 className='text-3xl font-semibold my-10 text-center text-emerald-100'>AI-Matched Job Opportunities</h3>
+        <h3 className='text-3xl font-semibold my-10 text-center text-emerald-100'>Your AI-Matched Job Opportunities</h3>
         {recommendedJobs.map((job, index) => (
           <div key={index} className='bg-slate-800/80 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-emerald-800/30 hover:border-emerald-700/50 transition-all duration-300 motion-preset-expand mb-4'>
             <h2 className='text-xl font-bold text-white mb-2'>{job.title}</h2>

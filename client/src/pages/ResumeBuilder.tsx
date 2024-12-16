@@ -29,7 +29,7 @@ const ResumeBuilder = () => {
     formData.append('resume', file);
 
     try {
-      const uploadResponse = await axios.post('http://localhost:5000/resumeBuilder/upload', formData, {
+      const uploadResponse = await axios.post('http://localhost:5000/api/resumeBuilder/upload', formData, {
         headers: {
           jwt_token: localStorage.token,
           'Content-Type': 'multipart/form-data'

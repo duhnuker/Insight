@@ -30,7 +30,7 @@ app.use("/auth", jwtAuth);
 app.use("/api/landing", landing);
 app.use("/api/userhome", userHome);
 app.use("/api/profile", profile);
-app.use("/resumeBuilder", resumeBuilder);
+app.use("/api/resumeBuilder", resumeBuilder);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

@@ -39,7 +39,7 @@ const Login = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
 
     return (
         <div className="min-h-screen bg-gradient-to-tr from-slate-900 via-emerald-900 to-green-700 flex justify-center items-center">
-            <div className="bg-slate-800/80 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-emerald-800/30 hover:border-emerald-700/50 transition-all duration-300 w-full max-w-md">
+            <div className="bg-slate-800/80 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-emerald-800/30 hover:border-emerald-700/50 transition-all duration-300 w-full max-w-md motion-scale-in-[0.5] motion-translate-x-in-[-1%] motion-translate-y-in-[42%] motion-opacity-in-[0%] motion-blur-in-[5px] motion-duration-[1.00s] motion-duration-[1.50s]/scale motion-duration-[1.50s]/translate">
                 <h1 className="text-6xl font-bold text-white mb-8 text-center">Insight</h1>
                 <div className="text-center pb-8 text-emerald-100 font-medium italic">
                     Welcome back

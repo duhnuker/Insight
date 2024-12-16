@@ -49,17 +49,17 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
     const onSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const skillsString = skills.map(skill => skill.value).join(', ');
-            const experiencesString = experiences.map(exp => exp.value).join(', ');
-            
-            const body = { 
-                email, 
-                password, 
-                name, 
-                skills: skillsString,
-                experience: experiencesString 
+            const skillsArray = skills.map(skill => skill.value.trim()).filter(Boolean);
+            const experiencesArray = experiences.map(exp => exp.value.trim()).filter(Boolean);
+
+            const body = {
+                email,
+                password,
+                name,
+                skills: skillsArray,
+                experience: experiencesArray
             };
-            
+
             const response = await axios.post(
                 "http://localhost:5000/auth/register",
                 body,
@@ -82,6 +82,7 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
             }
         }
     };
+
 
     return (
         <div className="min-h-screen bg-gradient-to-tr from-slate-900 via-emerald-900 to-green-700 flex justify-center items-center">
@@ -115,7 +116,7 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
                         value={password}
                         onChange={onChange}
                     />
-                    
+
                     <h4 className='text-white font-bold'>Skills</h4>
                     {skills.map((skill, index) => (
                         <div key={index} className="flex gap-2">

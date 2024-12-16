@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavBar from '../components/NavBar';
 
@@ -13,6 +13,7 @@ interface Job {
 
 const Landing = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -36,11 +37,11 @@ const Landing = () => {
         </div>
       </div>
       <div className='flex justify-center pb-4'>
-        <NavBar />
+        <NavBar isAuthenticated={isAuthenticated} />
       </div>
       <div className='allListings px-4 md:px-8 max-w-2xl mx-auto space-y-4'>
         {Array.isArray(jobs) && jobs.map((job) => (
-          <div key={job.id} className='bg-slate-800/80 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-emerald-800/30 hover:border-emerald-700/50 transition-all duration-300'>
+          <div key={job.id} className='bg-slate-800/80 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-emerald-800/30 hover:border-emerald-700/50 transition-all duration-300 motion-scale-in-[0.5] motion-translate-x-in-[-1%] motion-translate-y-in-[42%] motion-opacity-in-[0%] motion-blur-in-[5px] motion-duration-[1.00s] motion-duration-[1.50s]/scale motion-duration-[1.50s]/translate'>
             <h2 className='text-xl font-bold text-white mb-2'>{job.title}</h2>
             <p className='text-emerald-200 mb-2'>{job.company.display_name}</p>
             <p className='text-emerald-200 mb-2'>{job.location.display_name}</p>
