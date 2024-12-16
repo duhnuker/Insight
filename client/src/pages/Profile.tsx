@@ -5,8 +5,9 @@ import NavBar from '../components/NavBar';
 const Profile = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [skills, setSkills] = useState("");
+    const [skills, setSkills] = useState([{ value: "" }]);
     const [experiences, setExperiences] = useState([{ value: "" }]);
+
 
     const getProfile = async () => {
         try {
@@ -16,12 +17,27 @@ const Profile = () => {
 
             setName(response.data.name);
             setEmail(response.data.email);
-            setSkills(response.data.skills);
+            setSkills([{ value: response.data.skills }]);
             setExperiences([{ value: response.data.experience }]);
 
         } catch (error: unknown) {
             console.error("An unknown error occurred");
         }
+    };
+
+    const handleSkillChange = (index: number, value: string) => {
+        const newSkills = [...skills];
+        newSkills[index].value = value;
+        setSkills(newSkills);
+    };
+
+    const addSkillField = () => {
+        setSkills([...skills, { value: "" }]);
+    };
+
+    const removeSkillField = (index: number) => {
+        const newSkills = skills.filter((_, i) => i !== index);
+        setSkills(newSkills);
     };
 
     const handleExperienceChange = (index: number, value: string) => {
@@ -71,11 +87,30 @@ const Profile = () => {
                             className="w-full p-3 rounded border border-emerald-700 bg-slate-700/50 text-white"
                         />
                         <h4 className='text-white font-bold'>Skills</h4>
-                        <textarea
-                            placeholder="Skills"
-                            value={skills}
-                            className="w-full h-[150px] p-3 rounded border border-emerald-700 bg-slate-700/50 text-white align-top"
-                        />
+                        {skills.map((skill, index) => (
+                            <div key={index} className="flex gap-2">
+                                <input
+                                    placeholder="Skill"
+                                    value={skill.value}
+                                    onChange={(e) => handleSkillChange(index, e.target.value)}
+                                    className="w-full p-3 rounded border border-emerald-700 bg-slate-700/50 text-white align-top"
+                                />
+                                {skills.length > 1 && (
+                                    <button
+                                        onClick={() => removeSkillField(index)}
+                                        className="h-12 px-4 bg-red-700 text-white rounded-md hover:bg-red-800 transition duration-300"
+                                    >
+                                        X
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                        <button
+                            onClick={addSkillField}
+                            className="mt-2 px-4 py-2 bg-emerald-700 text-white rounded-md hover:bg-emerald-600 transition duration-300"
+                        >
+                            + Add Skill
+                        </button>
                         <h4 className='text-white font-bold'>Experience</h4>
                         {experiences.map((exp, index) => (
                             <div key={index} className="flex gap-2">
