@@ -12,7 +12,10 @@ router.get("/", authorise, async (req: Request & { user?: { id: string } }, res:
             return;
         }
 
-        const userProfile = await pool.query("SELECT u.id, u.name, u.email, p.skills, p.experience FROM users u LEFT JOIN profile p ON u.id = p.user_id WHERE u.id = $1", [req.user.id]);
+        const userProfile = await pool.query(
+            "SELECT u.id, u.name, u.email, p.skills::text[], p.experience::text[] FROM users u LEFT JOIN profile p ON u.id = p.user_id WHERE u.id = $1",
+            [req.user.id]
+        );
         res.json(userProfile.rows[0]);
 
     } catch (error: unknown) {
@@ -31,6 +34,9 @@ router.put("/", authorise, async (req: Request & { user?: { id: string } }, res:
 
         const { name, email, skills, experience } = req.body;
 
+        const skillsArray = Array.isArray(skills) ? skills : [skills];
+        const experienceArray = Array.isArray(experience) ? experience : [experience];
+
         await pool.query(
             "UPDATE users SET name = $1, email = $2, user_updated_at = CURRENT_TIMESTAMP WHERE id = $3",
             [name, email, req.user.id]
@@ -43,12 +49,12 @@ router.put("/", authorise, async (req: Request & { user?: { id: string } }, res:
 
         if (profileExists.rows.length > 0) {
             await pool.query(
-                "UPDATE profile SET name = $1, email = $2, skills = $3, experience = $4, updated_at = CURRENT_TIMESTAMP WHERE user_id = $5",
+                "UPDATE profile SET name = $1, email = $2, skills = $3::text[], experience = $4::text[], updated_at = CURRENT_TIMESTAMP WHERE user_id = $5",
                 [name, email, skills, experience, req.user.id]
             );
         } else {
             await pool.query(
-                "INSERT INTO profile (user_id, name, email, skills, experience) VALUES ($1, $2, $3, $4, $5)",
+                "INSERT INTO profile (user_id, name, email, skills, experience) VALUES ($1, $2, $3, $4::text[], $5::text[])",
                 [req.user.id, name, email, skills, experience]
             );
         }
@@ -74,9 +80,9 @@ router.delete("/:id", authorise, async (req: Request & { user?: { id: string } }
         const { id } = req.params;
 
         await pool.query("DELETE FROM recommendations WHERE user_id = $1", [req.user.id]);
-        
+
         await pool.query("DELETE FROM profile WHERE user_id = $1", [req.user.id]);
-        
+
         const deleteUser = await pool.query("DELETE FROM users WHERE id = $1 RETURNING *", [req.user.id]);
 
         if (deleteUser.rows.length === 0) {
