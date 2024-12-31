@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const Login = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
@@ -61,12 +62,18 @@ const Login = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
                         value={password}
                         onChange={onChange}
                     />
+                    <div>
                     <button
                         type="submit"
-                        className="w-full bg-emerald-700 text-white py-3 rounded-md hover:bg-emerald-600 hover:shadow-lg transition duration-300 font-medium"
+                        className="w-full mb-6 bg-emerald-700 text-white py-3 rounded-md hover:bg-emerald-600 hover:shadow-lg transition duration-300 font-medium"
                     >
                         Login
                     </button>
+                    <Link to="/"><button className='w-full bg-red-700 text-white py-3 rounded-md hover:bg-red-800 hover:shadow-lg transition duration-300 font-medium'>
+                            Go Back
+                            </button>
+                    </Link>
+                    </div>
                 </form>
             </div>
         </div>
