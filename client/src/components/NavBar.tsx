@@ -16,8 +16,8 @@ const NavBar: React.FC<NavBarProps> = ({ isAuthenticated }) => {
     <ul className='flex space-x-8 text-white'>
       {!isAuthenticated && (
         <>
-        <Link to="/login"><li className='px-6 py-2 bg-emerald-500 text-white rounded-md hover:bg-emerald-600 hover:shadow-lg transition duration-300 font-medium inline-block text-center'>Login</li></Link>
-        <Link to="/register"><li className='px-4 py-2 bg-emerald-500 text-white rounded-md hover:bg-emerald-600 hover:shadow-lg transition duration-300 font-medium inline-block text-center'>Register</li></Link>
+        <Link to="/login"><li className='px-6 py-1 bg-emerald-500 text-white rounded-md hover:bg-emerald-600 hover:shadow-lg transition duration-300 font-medium inline-block text-center'>Login</li></Link>
+        <Link to="/register"><li className='px-4 py-1 bg-emerald-500 text-white rounded-md hover:bg-emerald-600 hover:shadow-lg transition duration-300 font-medium inline-block text-center'>Register</li></Link>
         </>
       )}
       {isAuthenticated && (
