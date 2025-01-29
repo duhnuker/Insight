@@ -1,4 +1,4 @@
-import express  from "express";
+import express from "express";
 import pkg from 'pg';
 const { Pool } = pkg;
 import cors from "cors";
@@ -11,19 +11,34 @@ import resumeBuilder from "./routes/resumeBuilder.js";
 
 const app = express();
 app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials: true
+    origin: [
+        'https://insight-eosin-tau.vercel.app',
+        'http://localhost:5173'
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
 }));
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
 export const pool = new Pool({
-    user: process.env.PG_USER,
-    host: process.env.PG_HOST,
-    database: process.env.PG_NAME,
-    password: process.env.PG_PASSWORD,
+    ssl: {
+        rejectUnauthorized: false
+    },
+    user: String(process.env.SUPABASE_DB_USER),
+    host: String(process.env.SUPABASE_DB_HOST),
+    database: String(process.env.SUPABASE_DB_NAME),
+    password: String(process.env.SUPABASE_PASSWORD),
     port: 5432
+});
+
+pool.query('SELECT NOW()', (err, res) => {
+    if (err) {
+        console.error('Database connection error:', err);
+    } else {
+        console.log('Database connected successfully');
+    }
 });
 
 app.use("/auth", jwtAuth);
@@ -32,6 +47,6 @@ app.use("/api/userhome", userHome);
 app.use("/api/profile", profile);
 app.use("/api/resumeBuilder", resumeBuilder);
 
-app.listen(PORT, () => {
+app.listen(Number(PORT), '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}`);
 });
