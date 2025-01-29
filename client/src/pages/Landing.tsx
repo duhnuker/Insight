@@ -14,7 +14,7 @@ interface Job {
 const Landing = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated] = useState(false);
 
   useEffect(() => {
     const fetchJobs = async () => {
