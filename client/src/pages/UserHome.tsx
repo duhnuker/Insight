@@ -17,7 +17,7 @@ const UserHome = () => {
 
   const getProfile = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/userhome", {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/userhome`, {
         headers: { jwt_token: localStorage.token }
       });
 

@@ -29,7 +29,7 @@ const ResumeBuilder = () => {
     formData.append('resume', file);
 
     try {
-      const uploadResponse = await axios.post('http://localhost:5000/api/resumeBuilder/upload', formData, {
+      const uploadResponse = await axios.post(`${import.meta.env.VITE_API_URL}/api/resumeBuilder/upload`, formData, {
         headers: {
           jwt_token: localStorage.token,
           'Content-Type': 'multipart/form-data'
@@ -54,7 +54,7 @@ const ResumeBuilder = () => {
 
   const viewResume = async (fileId: string) => {
     try {
-      const response = await axios.get(`http://localhost:5000/resumeBuilder/file/${fileId}`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/resumeBuilder/file/${fileId}`, {
         headers: {
           jwt_token: localStorage.token
         },
@@ -81,7 +81,7 @@ const ResumeBuilder = () => {
 
     setIsAnalysing(true);
     try {
-      const analysisResponse = await axios.get(`http://localhost:5000/resumeBuilder/analysis/${uploadedFileId}`, {
+      const analysisResponse = await axios.get(`${import.meta.env.VITE_API_URL}/resumeBuilder/analysis/${uploadedFileId}`, {
         headers: { jwt_token: localStorage.token }
       });
       setAnalysis(analysisResponse.data.analysis);

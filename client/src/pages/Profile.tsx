@@ -11,7 +11,7 @@ const Profile = () => {
 
     const getProfile = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/profile", {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/profile`, {
                 headers: { jwt_token: localStorage.token }
             });
 
@@ -70,7 +70,7 @@ const Profile = () => {
             const experiencesString = experiences.map(exp => exp.value).join(', ');
 
             await axios.put(
-                "http://localhost:5000/api/profile",
+                `${import.meta.env.VITE_API_URL}/api/profile`,
                 {
                     name,
                     email,

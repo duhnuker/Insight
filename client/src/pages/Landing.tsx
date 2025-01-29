@@ -19,7 +19,7 @@ const Landing = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/landing');
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/landing`);
         setJobs(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error('Error fetching jobs:', error);

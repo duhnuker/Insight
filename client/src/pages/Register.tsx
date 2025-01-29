@@ -62,7 +62,7 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
             };
 
             const response = await axios.post(
-                "http://localhost:5000/auth/register",
+                `${import.meta.env.VITE_API_URL}/auth/register`,
                 body,
                 {
                     headers: {
