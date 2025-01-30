@@ -8,6 +8,8 @@ import landing from "./routes/landing.js";
 import userHome from "./routes/userHome.js";
 import profile from "./routes/profile.js";
 import resumeBuilder from "./routes/resumeBuilder.js";
+import { createClient } from '@supabase/supabase-js';
+
 
 const app = express();
 app.use(cors({
@@ -40,6 +42,11 @@ pool.query('SELECT NOW()', (err, res) => {
         console.log('Database connected successfully');
     }
 });
+
+export const supabase = createClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 app.use("/auth", jwtAuth);
 app.use("/api/landing", landing);

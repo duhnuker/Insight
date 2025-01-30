@@ -8,6 +8,7 @@ import textract from 'textract';
 import { promises as fsPromises } from 'fs';
 import { promisify } from "util";
 import { HfInference } from "@huggingface/inference";
+import { supabase } from "../index.js";
 
 const hf = new HfInference(process.env.HF_ACCESS_TOKEN);
 
@@ -27,7 +28,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 5 * 1024 * 1024
   },
@@ -45,17 +46,21 @@ const upload = multer({
 
 router.post("/upload", authorise, upload.single('resume'), async (req: Request & { user?: { id: string } }, res: Response): Promise<void> => {
   try {
-    if (!req.file) {
-      res.status(400).json({ error: 'Please upload a valid file' });
+    if (!req.file || !req.user) {
+      res.status(400).json({ error: 'Invalid request' });
       return;
     }
 
-    if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
+    const fileName = `${Date.now()}-${req.file.originalname}`;
+    const filePath = `resumes/${req.user.id}/${fileName}`;
 
-    const filePath = path.join('./uploads/', req.file.filename);
+    const { data, error } = await supabase.storage
+      .from('resumes')
+      .upload(filePath, req.file.buffer, {
+        contentType: req.file.mimetype,
+      });
+
+    if (error) throw error;
 
     const { rows } = await pool.query(
       'INSERT INTO resume_uploads (user_id, filename, status) VALUES ($1, $2, $3) RETURNING id',
@@ -68,7 +73,6 @@ router.post("/upload", authorise, upload.single('resume'), async (req: Request &
     res.status(500).json({ error: 'Upload failed' });
   }
 });
-
 
 
 router.get("/analysis/:id", authorise, async (req: Request & { user?: { id: string } }, res: Response): Promise<void> => {
@@ -89,15 +93,19 @@ router.get("/analysis/:id", authorise, async (req: Request & { user?: { id: stri
     }
 
     const filePath = rows[0].filename;
-    console.log('Analyzing file:', filePath);
+    
+    const { data, error } = await supabase.storage
+      .from('resumes')
+      .download(filePath);
 
-    if (!fs.existsSync(filePath)) {
-      res.status(404).json({ error: 'Resume file not found' });
-      return;
-    }
+    if (error) throw error;
 
-    const resumeText = await textractFromFile(filePath);
-    console.log('Successfully extracted text from PDF');
+    const buffer = Buffer.from(await data.arrayBuffer());
+    const tempFilePath = `/tmp/${path.basename(filePath)}`;
+    await fsPromises.writeFile(tempFilePath, buffer);
+
+    const resumeText = await textractFromFile(tempFilePath);
+    await fsPromises.unlink(tempFilePath);
 
     const prompt = `Analyze this resume and provide a clear, structured analysis with specific recommendations:
 
@@ -139,19 +147,14 @@ router.get("/analysis/:id", authorise, async (req: Request & { user?: { id: stri
     res.json({ analysis: outputOnly });
 
   } catch (error) {
-    console.error('Detailed analysis error:', error);
-    if (error instanceof Error) {
-      res.status(500).json({ error: `Analysis failed: ${error.message}` });
-    } else {
-      res.status(500).json({ error: 'Analysis failed' });
-    }
+    console.error('Analysis error:', error);
+    res.status(500).json({ error: 'Analysis failed' });
   }
 });
 
 
 router.get("/file/:id", authorise, async (req: Request & { user?: { id: string } }, res: Response): Promise<void> => {
   try {
-
     if (!req.user) {
       res.status(401).json({ error: 'Unauthorized' });
       return;
@@ -168,13 +171,14 @@ router.get("/file/:id", authorise, async (req: Request & { user?: { id: string }
     }
 
     const filePath = rows[0].filename;
+    
+    const { data, error } = await supabase.storage
+      .from('resumes')
+      .createSignedUrl(filePath, 60);
 
-    if (!fs.existsSync(filePath)) {
-      res.status(404).json({ error: 'File not found on server' });
-      return;
-    }
+    if (error) throw error;
 
-    res.sendFile(path.resolve(filePath));
+    res.json({ url: data.signedUrl });
   } catch (error) {
     console.error('File retrieval error:', error);
     res.status(500).json({ error: 'File retrieval failed' });
