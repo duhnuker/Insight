@@ -15,14 +15,17 @@ const Landing = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchJobs = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/landing`);
         setJobs(Array.isArray(response.data) ? response.data : []);
+        setIsLoading(false);
       } catch (error) {
         console.error('Error fetching jobs:', error);
+        setIsLoading(false);
       }
     };
 
@@ -50,30 +53,35 @@ const Landing = () => {
         />
       </div>
       <div className='allListings px-4 md:px-8 max-w-2xl mx-auto space-y-4'>
-        {Array.isArray(jobs) && jobs
-          .filter(job =>
-            job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            job.company.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            job.description.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-          .map((job) => (
-            <div key={job.id} className='bg-slate-800/80 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-emerald-800/30 hover:border-emerald-700/50 transition-all duration-300 motion-scale-in-[0.5] motion-translate-x-in-[-1%] motion-translate-y-in-[42%] motion-opacity-in-[0%] motion-blur-in-[5px] motion-duration-[1.00s] motion-duration-[1.50s]/scale motion-duration-[1.50s]/translate'>
-              <h2 className='text-xl font-bold text-white mb-2'>{job.title}</h2>
-              <p className='text-emerald-200 mb-2'>{job.company.display_name}</p>
-              <p className='text-emerald-200 mb-2'>{job.location.display_name}</p>
-              <p className='text-slate-300 mb-4'>{job.description.slice(0, 150)}...</p>
-              <a
-                href={job.redirect_url}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='w-full bg-emerald-700 text-white py-3 rounded-md hover:bg-emerald-600 hover:shadow-lg transition duration-300 font-medium inline-block text-center'
-              >
-                Apply Now
-              </a>
-            </div>
-          ))}
+        {isLoading ? (
+          <div className="text-center py-8">
+            <h2 className="text-2xl font-semibold text-white">Please wait, jobs are loading...</h2>
+          </div>
+        ) : (
+          Array.isArray(jobs) && jobs
+            .filter(job =>
+              job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              job.company.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              job.description.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            .map((job) => (
+              <div key={job.id} className='bg-slate-800/80 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-emerald-800/30 hover:border-emerald-700/50 transition-all duration-300 motion-scale-in-[0.5] motion-translate-x-in-[-1%] motion-translate-y-in-[42%] motion-opacity-in-[0%] motion-blur-in-[5px] motion-duration-[1.00s] motion-duration-[1.50s]/scale motion-duration-[1.50s]/translate'>
+                <h2 className='text-xl font-bold text-white mb-2'>{job.title}</h2>
+                <p className='text-emerald-200 mb-2'>{job.company.display_name}</p>
+                <p className='text-emerald-200 mb-2'>{job.location.display_name}</p>
+                <p className='text-slate-300 mb-4'>{job.description.slice(0, 150)}...</p>
+                <a
+                  href={job.redirect_url}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='w-full bg-emerald-700 text-white py-3 rounded-md hover:bg-emerald-600 hover:shadow-lg transition duration-300 font-medium inline-block text-center'
+                >
+                  Apply Now
+                </a>
+              </div>
+            ))
+        )}
       </div>
-
     </div>
   );
 };
