@@ -24,14 +24,14 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 export const pool = new Pool({
-    ssl: {
-        rejectUnauthorized: false
-    },
-    user: String(process.env.SUPABASE_DB_USER),
-    host: String(process.env.SUPABASE_DB_HOST),
-    database: String(process.env.SUPABASE_DB_NAME),
-    password: String(process.env.SUPABASE_PASSWORD),
+    ssl: isProduction ? { rejectUnauthorized: false } : false,
+    user: String(isProduction ? process.env.SUPABASE_DB_USER : process.env.DB_USER),
+    host: String(isProduction ? process.env.SUPABASE_DB_HOST : process.env.DB_HOST),
+    database: String(isProduction ? process.env.SUPABASE_DB_NAME : process.env.DB_NAME),
+    password: String(isProduction ? process.env.SUPABASE_PASSWORD : process.env.DB_PASSWORD),
     port: 5432
 });
 
