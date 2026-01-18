@@ -3,10 +3,18 @@ import { pipeline } from '@xenova/transformers';
 import { pool } from "../index.js";
 import authorise from "../middleware/authorise.js";
 import axios from "axios";
+import redisClient from "../redisClient.js";
 
 const router: Router = express.Router();
 
 async function getAdzunaJobs() {
+    const cacheKey = 'adzuna_jobs_raw';
+    const cachedJobs = await redisClient.get(cacheKey);
+
+    if (cachedJobs) {
+        return JSON.parse(cachedJobs);
+    }
+
     const APP_ID = process.env.ADZUNA_APP_ID;
     const APP_KEY = process.env.ADZUNA_APP_KEY;
 
@@ -19,7 +27,10 @@ async function getAdzunaJobs() {
     };
 
     const response = await axios.get(baseURL, { params });
-    return response.data.results;
+    const jobs = response.data.results;
+
+    await redisClient.setEx(cacheKey, 3600, JSON.stringify(jobs));
+    return jobs;
 }
 
 interface ZeroShotOutput {
@@ -29,7 +40,7 @@ interface ZeroShotOutput {
 
 async function getJobRecommendations(userProfile: string, jobs: any[]) {
     const classifier = await pipeline('zero-shot-classification', 'Xenova/distilbert-base-uncased-mnli');
-    
+
     if (jobs.length === 0) {
         return null;
     }
@@ -56,31 +67,49 @@ router.get("/", authorise, async (req: Request & { user?: { id: string } }, res:
             return;
         }
 
-        // Get user data from Users table
+        const userId = req.user.id;
+        const cacheKey = `user_recommendations:${userId}`;
+
+        const cachedRecs = await redisClient.get(cacheKey);
+        if (cachedRecs) {
+            console.log(`Cache Hit: Recommendations for user ${userId}`);
+            const data = JSON.parse(cachedRecs);
+            res.json(data);
+            return;
+        }
+
+        console.log(`Cache Miss: Computing recommendations for user ${userId}`);
+
         const userData = await pool.query(
             "SELECT u.name, p.skills, p.experience FROM users u LEFT JOIN profile p ON u.id = p.user_id WHERE u.id = $1",
-            [req.user.id]
+            [userId]
         );
 
-        // Get jobs and create user profile string
+        if (userData.rows.length === 0) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+
         const jobs = await getAdzunaJobs();
         const userProfile = `Skills: ${userData.rows[0].skills || ''}\nExperience: ${userData.rows[0].experience || ''}`;
-        
-        // Get recommended job
-        const recommendedJob = await getJobRecommendations(userProfile, jobs);
 
-        // Send both user data and recommended job
-        res.json({
+        const recommendedJobs = await getJobRecommendations(userProfile, jobs);
+
+        const responseData = {
             name: userData.rows[0].name,
-            recommendedJobs: recommendedJob
-        });
-        
+            recommendedJobs: recommendedJobs
+        };
+
+        await redisClient.setEx(cacheKey, 3600, JSON.stringify(responseData));
+
+        res.json(responseData);
 
     } catch (error: unknown) {
         console.error(error instanceof Error ? error.message : "Unknown error");
         res.status(500).json({ message: "Server Error" });
     }
 });
+
 
 
 
