@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import UserHome from "./pages/UserHome";
 import Profile from "./pages/Profile";
 import ResumeBuilder from "./pages/ResumeBuilder";
+import Plasma from "./components/Plasma";
 
 function App() {
 
@@ -44,14 +45,28 @@ function App() {
       v7_startTransition: true,
       v7_relativeSplatPath: true
     }}>
-      <Routes>
-        <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/userHome" />}></Route>
-        <Route path="/register" element={!isAuthenticated ? <Register setAuth={setAuth} /> : <Navigate to="/userHome" />}></Route>
-        <Route path="/login" element={!isAuthenticated ? <Login setAuth={setAuth} /> : <Navigate to="/userHome" />}></Route>
-        <Route path="/userHome" element={!isAuthenticated ? <Landing /> : <UserHome />}></Route>
-        <Route path="/profile" element={!isAuthenticated ? <Landing /> : <Profile />}></Route>
-        <Route path="/resumeBuilder" element={!isAuthenticated ? <Landing /> : <ResumeBuilder />}></Route>
-        </Routes>
+      <div className="min-h-screen bg-black relative">
+        <div className="fixed inset-0 z-0 opacity-60">
+          <Plasma
+            color="#10b981"
+            direction='pingpong'
+            speed={0.3}
+            scale={1.5}
+            opacity={0.5}
+            mouseInteractive={false}
+          />
+        </div>
+        <div className="relative z-10 w-full min-h-screen">
+          <Routes>
+            <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/userHome" />}></Route>
+            <Route path="/register" element={!isAuthenticated ? <Register setAuth={setAuth} /> : <Navigate to="/userHome" />}></Route>
+            <Route path="/login" element={!isAuthenticated ? <Login setAuth={setAuth} /> : <Navigate to="/userHome" />}></Route>
+            <Route path="/userHome" element={!isAuthenticated ? <Landing /> : <UserHome />}></Route>
+            <Route path="/profile" element={!isAuthenticated ? <Landing /> : <Profile />}></Route>
+            <Route path="/resumeBuilder" element={!isAuthenticated ? <Landing /> : <ResumeBuilder />}></Route>
+          </Routes>
+        </div>
+      </div>
     </Router>
   )
 }

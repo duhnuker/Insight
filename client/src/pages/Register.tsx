@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { Card, CardBody, CardHeader, Input, Button, Select, SelectItem, Checkbox } from "@heroui/react";
+
+const months = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+];
 
 const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
     const [inputs, setInputs] = useState({
@@ -8,8 +14,17 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
         password: "",
         name: "",
     });
-    const [skills, setSkills] = useState([{ value: "" }]);
-    const [experiences, setExperiences] = useState([{ value: "" }]);
+    const [skills, setSkills] = useState([{ value: "", locked: false }]);
+    const [experiences, setExperiences] = useState<{ value: string; locked: boolean }[]>([]);
+    const [activeExp, setActiveExp] = useState({
+        title: "",
+        company: "",
+        startMonth: "",
+        startYear: "",
+        endMonth: "",
+        endYear: "",
+        isCurrent: false
+    });
 
     const { email, password, name } = inputs;
 
@@ -24,7 +39,13 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
     };
 
     const addSkillField = () => {
-        setSkills([...skills, { value: "" }]);
+        if (skills.length === 0 || skills[skills.length - 1].value.trim() !== "") {
+            const newSkills = [...skills];
+            if (newSkills.length > 0) {
+                newSkills[newSkills.length - 1].locked = true;
+            }
+            setSkills([...newSkills, { value: "", locked: false }]);
+        }
     };
 
     const removeSkillField = (index: number) => {
@@ -32,14 +53,27 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
         setSkills(newSkills);
     };
 
-    const handleExperienceChange = (index: number, value: string) => {
-        const newExperiences = [...experiences];
-        newExperiences[index].value = value;
-        setExperiences(newExperiences);
-    };
 
     const addExperienceField = () => {
-        setExperiences([...experiences, { value: "" }]);
+        if (activeExp.title.trim() && activeExp.company.trim() && activeExp.startMonth && activeExp.startYear) {
+            const startStr = `${activeExp.startMonth} ${activeExp.startYear}`;
+            const endStr = activeExp.isCurrent ? "Present" :
+                (activeExp.endMonth && activeExp.endYear ? `${activeExp.endMonth} ${activeExp.endYear}` : "");
+
+            if (endStr) {
+                const combinedValue = `${activeExp.title.trim()} at ${activeExp.company.trim()} (${startStr} - ${endStr})`;
+                setExperiences([...experiences, { value: combinedValue, locked: true }]);
+                setActiveExp({
+                    title: "",
+                    company: "",
+                    startMonth: "",
+                    startYear: "",
+                    endMonth: "",
+                    endYear: "",
+                    isCurrent: false
+                });
+            }
+        }
     };
 
     const removeExperienceField = (index: number) => {
@@ -86,106 +120,274 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
 
 
     return (
-        <div className="min-h-screen bg-gradient-to-tr from-slate-900 via-emerald-900 to-green-700 flex justify-center items-center">
-            <div className="bg-slate-800/80 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-emerald-800/30 hover:border-emerald-700/50 transition-all duration-300 w-full max-w-md motion-scale-in-[0.5] motion-translate-x-in-[-1%] motion-translate-y-in-[42%] motion-opacity-in-[0%] motion-blur-in-[5px] motion-duration-[1.00s] motion-duration-[1.50s]/scale motion-duration-[1.50s]/translate">
-                <h1 className="text-6xl font-bold text-white mb-8 text-center">Insight</h1>
-                <div className="text-center pb-8 text-emerald-100 font-medium italic">
-                    Start your journey with us
-                </div>
-                <form onSubmit={onSubmitForm} className="space-y-6">
-                    <input
-                        className="w-full px-4 py-3 rounded-md border border-emerald-800/30 bg-slate-700/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition"
-                        type='text'
-                        name='name'
-                        placeholder='Full Name'
-                        value={name}
-                        onChange={onChange}
-                    />
-                    <input
-                        className="w-full px-4 py-3 rounded-md border border-emerald-800/30 bg-slate-700/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition"
-                        type='text'
-                        name='email'
-                        placeholder='Email'
-                        value={email}
-                        onChange={onChange}
-                    />
-                    <input
-                        className="w-full px-4 py-3 rounded-md border border-emerald-800/30 bg-slate-700/50 text-white focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition"
-                        type='password'
-                        name='password'
-                        placeholder='Password'
-                        value={password}
-                        onChange={onChange}
-                    />
+        <div className="min-h-screen flex justify-center items-center p-4 relative overflow-y-auto scrollbar-hide py-12">
 
-                    <h4 className='text-white font-bold'>Skills</h4>
-                    {skills.map((skill, index) => (
-                        <div key={index} className="flex gap-2">
-                            <input
-                                placeholder="Skill"
-                                value={skill.value}
-                                onChange={(e) => handleSkillChange(index, e.target.value)}
-                                className="w-full p-3 rounded border border-emerald-700 bg-slate-700/50 text-white"
-                            />
-                            {skills.length > 1 && (
-                                <button
-                                    type="button"
-                                    onClick={() => removeSkillField(index)}
-                                    className="h-12 px-4 bg-red-700 text-white rounded-md hover:bg-red-800 transition duration-300"
-                                >
-                                    X
-                                </button>
-                            )}
+            <div className="relative z-10 w-full max-w-3xl group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600/20 to-teal-600/20 rounded-2xl blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                <Card className="bg-zinc-900/80 backdrop-blur-xl border border-white/5 group-hover:border-emerald-500/30 transition-all duration-500 group-hover:shadow-[0_0_50px_-12px_rgba(16,185,129,0.2)] w-full max-w-3xl motion-scale-in-[0.5] motion-translate-x-in-[-1%] motion-translate-y-in-[42%] motion-opacity-in-[0%] motion-blur-in-[5px] motion-duration-[1.00s]">
+                    <CardHeader className="flex-col gap-4 p-8 pb-4">
+                        <h1 className="text-6xl font-bold text-white text-center">Insight</h1>
+                        <div className="text-center text-emerald-400 font-medium italic">
+                            Start your journey with us
                         </div>
-                    ))}
-                    <button
-                        type="button"
-                        onClick={addSkillField}
-                        className="mt-2 px-4 py-2 bg-emerald-700 text-white rounded-md hover:bg-emerald-600 transition duration-300"
-                    >
-                        + Add Skill
-                    </button>
+                    </CardHeader>
+                    <CardBody className="p-6 md:p-10 pt-4">
+                        <form onSubmit={onSubmitForm} className="space-y-12">
+                            <div className="space-y-6">
+                                <h4 className='text-white font-bold text-xl border-b border-white/5 pb-2'>Your information</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="md:col-span-2">
+                                        <Input
+                                            type='text'
+                                            name='name'
+                                            placeholder='Enter your full name'
+                                            value={name}
+                                            onChange={onChange}
+                                            classNames={{
+                                                input: "text-white focus:outline-none h-full",
+                                                inputWrapper: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 group-data-[focus=true]:border-emerald-500/80 rounded-lg h-14 items-center transition-all duration-300 shadow-lg hover:shadow-emerald-500/5"
+                                            }}
+                                            size="lg"
+                                        />
+                                    </div>
+                                    <Input
+                                        type='text'
+                                        name='email'
+                                        placeholder='Enter your email'
+                                        value={email}
+                                        onChange={onChange}
+                                        classNames={{
+                                            input: "text-white focus:outline-none h-full",
+                                            inputWrapper: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 group-data-[focus=true]:border-emerald-500/80 rounded-lg h-14 items-center transition-all duration-300 shadow-lg hover:shadow-emerald-500/5"
+                                        }}
+                                        size="lg"
+                                    />
+                                    <Input
+                                        type='password'
+                                        name='password'
+                                        placeholder='Enter your password'
+                                        value={password}
+                                        onChange={onChange}
+                                        classNames={{
+                                            input: "text-white focus:outline-none h-full",
+                                            inputWrapper: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 group-data-[focus=true]:border-emerald-500/80 rounded-lg h-14 items-center transition-all duration-300 shadow-lg hover:shadow-emerald-500/5"
+                                        }}
+                                        size="lg"
+                                    />
+                                </div>
+                            </div>
 
-                    <h4 className='text-white font-bold'>Experience</h4>
-                    {experiences.map((exp, index) => (
-                        <div key={index} className="flex gap-2">
-                            <input
-                                placeholder="Experience"
-                                value={exp.value}
-                                onChange={(e) => handleExperienceChange(index, e.target.value)}
-                                className="w-full p-3 rounded border border-emerald-700 bg-slate-700/50 text-white"
-                            />
-                            {experiences.length > 1 && (
-                                <button
-                                    type="button"
-                                    onClick={() => removeExperienceField(index)}
-                                    className="h-12 px-4 bg-red-700 text-white rounded-md hover:bg-red-800 transition duration-300"
+                            <div className="space-y-6">
+                                <h4 className='text-white font-bold text-xl border-b border-white/5 pb-2'>Skills</h4>
+
+                                {/* Skills Display Area - Chips */}
+                                <div className="flex flex-wrap gap-3">
+                                    {skills.filter(s => s.locked).map((skill, index) => (
+                                        <div key={index} className="flex gap-2 items-center bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-medium rounded-full py-1.5 px-4 shadow-sm group/chip hover:bg-emerald-500/20 transition-all duration-300">
+                                            <span>{skill.value}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeSkillField(skills.indexOf(skill))}
+                                                className="text-emerald-500/50 hover:text-red-400 transition-colors"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Skills Input Area */}
+                                <div className="flex gap-3">
+                                    <Input
+                                        placeholder="Add a skill (e.g., React, Node.js)"
+                                        value={skills.find(s => !s.locked)?.value || ""}
+                                        onChange={(e) => {
+                                            const activeIndex = skills.findIndex(s => !s.locked);
+                                            if (activeIndex !== -1) handleSkillChange(activeIndex, e.target.value);
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                addSkillField();
+                                            }
+                                        }}
+                                        classNames={{
+                                            input: "text-white focus:outline-none h-full",
+                                            inputWrapper: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 group-data-[focus=true]:border-emerald-500/80 rounded-lg h-14 items-center transition-all duration-300 shadow-lg hover:shadow-emerald-500/5"
+                                        }}
+                                        size="lg"
+                                        className="flex-1"
+                                    />
+                                    <Button
+                                        type="button"
+                                        onClick={addSkillField}
+                                        className="h-14 bg-emerald-700 text-white hover:bg-emerald-600 rounded-lg px-8 transition-all duration-300 font-bold"
+                                    >
+                                        Add
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div className="space-y-6">
+                                <h4 className='text-white font-bold text-xl border-b border-white/5 pb-2'>Experience</h4>
+
+                                {/* Experience Display Area */}
+                                <div className="space-y-4">
+                                    {experiences.map((exp, index) => (
+                                        <div key={index} className="flex gap-4 items-center group">
+                                            <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-medium rounded-lg h-14 flex items-center justify-between w-full shadow-lg shadow-emerald-500/5 px-6">
+                                                <span>{exp.value}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeExperienceField(index)}
+                                                    className="opacity-50 hover:opacity-100 hover:text-red-400 transition-all text-xl"
+                                                >
+                                                    ✕
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Experience Input Area - Structured Fields */}
+                                <div className="space-y-6 bg-zinc-800/20 p-6 rounded-xl border border-white/5">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <Input
+                                            placeholder="Job Title (e.g. Senior Developer)"
+                                            value={activeExp.title}
+                                            onChange={(e) => setActiveExp({ ...activeExp, title: e.target.value })}
+                                            classNames={{
+                                                input: "text-white focus:outline-none h-full",
+                                                inputWrapper: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 group-data-[focus=true]:border-emerald-500/80 rounded-lg h-14 items-center transition-all duration-300 shadow-lg"
+                                            }}
+                                            size="lg"
+                                        />
+                                        <Input
+                                            placeholder="Company (e.g. Google)"
+                                            value={activeExp.company}
+                                            onChange={(e) => setActiveExp({ ...activeExp, company: e.target.value })}
+                                            classNames={{
+                                                input: "text-white focus:outline-none h-full",
+                                                inputWrapper: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 group-data-[focus=true]:border-emerald-500/80 rounded-lg h-14 items-center transition-all duration-300 shadow-lg"
+                                            }}
+                                            size="lg"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                            <Select
+                                                placeholder="Start Month"
+                                                size="lg"
+                                                className="text-white"
+                                                selectedKeys={activeExp.startMonth ? [activeExp.startMonth] : []}
+                                                onSelectionChange={(keys) => setActiveExp({ ...activeExp, startMonth: Array.from(keys)[0] as string })}
+                                                classNames={{
+                                                    trigger: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 rounded-lg h-14",
+                                                    value: "text-white",
+                                                    popoverContent: "bg-zinc-900 border border-white/10 text-white"
+                                                }}
+                                            >
+                                                {months.map((month) => (
+                                                    <SelectItem key={month} className="text-white">
+                                                        {month}
+                                                    </SelectItem>
+                                                ))}
+                                            </Select>
+                                            <Input
+                                                placeholder="Start Year"
+                                                value={activeExp.startYear}
+                                                onChange={(e) => setActiveExp({ ...activeExp, startYear: e.target.value })}
+                                                maxLength={4}
+                                                classNames={{
+                                                    input: "text-white h-full",
+                                                    inputWrapper: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 rounded-lg h-14"
+                                                }}
+                                                size="lg"
+                                            />
+                                            {!activeExp.isCurrent && (
+                                                <>
+                                                    <Select
+                                                        placeholder="End Month"
+                                                        size="lg"
+                                                        className="text-white"
+                                                        selectedKeys={activeExp.endMonth ? [activeExp.endMonth] : []}
+                                                        onSelectionChange={(keys) => setActiveExp({ ...activeExp, endMonth: Array.from(keys)[0] as string })}
+                                                        classNames={{
+                                                            trigger: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 rounded-lg h-14",
+                                                            value: "text-white",
+                                                            popoverContent: "bg-zinc-900 border border-white/10 text-white"
+                                                        }}
+                                                    >
+                                                        {months.map((month) => (
+                                                            <SelectItem key={month} className="text-white">
+                                                                {month}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </Select>
+                                                    <Input
+                                                        placeholder="End Year"
+                                                        value={activeExp.endYear}
+                                                        onChange={(e) => setActiveExp({ ...activeExp, endYear: e.target.value })}
+                                                        maxLength={4}
+                                                        classNames={{
+                                                            input: "text-white h-full",
+                                                            inputWrapper: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 rounded-lg h-14"
+                                                        }}
+                                                        size="lg"
+                                                    />
+                                                </>
+                                            )}
+                                        </div>
+
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2 cursor-pointer group" onClick={() => setActiveExp({ ...activeExp, isCurrent: !activeExp.isCurrent })}>
+                                                <Checkbox
+                                                    isSelected={activeExp.isCurrent}
+                                                    onValueChange={(val) => setActiveExp({ ...activeExp, isCurrent: val })}
+                                                    color="success"
+                                                    size="sm"
+                                                    classNames={{
+                                                        wrapper: "w-4 h-4 min-w-[16px] m-0 before:border-emerald-500/30 after:bg-emerald-600"
+                                                    }}
+                                                />
+                                                <span className="text-white/50 text-xs select-none group-hover:text-emerald-400/80 transition-colors pl-2">
+                                                    I currently work here
+                                                </span>
+                                            </div>
+
+                                            <Button
+                                                type="button"
+                                                onClick={addExperienceField}
+                                                className="h-14 bg-emerald-700 text-white hover:bg-emerald-600 rounded-lg px-12 transition-all duration-300 font-bold"
+                                            >
+                                                Add Experience
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
+                                <Button
+                                    type="submit"
+                                    className="w-full bg-emerald-700 text-white hover:bg-emerald-600 font-medium rounded-lg py-2 transition-all duration-300 hover:shadow-emerald-500/20 order-1 md:order-2"
+                                    size="lg"
                                 >
-                                    X
-                                </button>
-                            )}
-                        </div>
-                    ))}
-                    <button
-                        type="button"
-                        onClick={addExperienceField}
-                        className="mt-2 px-4 py-2 bg-emerald-700 text-white rounded-md hover:bg-emerald-600 transition duration-300"
-                    >
-                        + Add Experience
-                    </button>
-                    <div>
-                        <button
-                            type="submit"
-                            className="w-full mb-6 bg-emerald-700 text-white py-3 rounded-md hover:bg-emerald-600 hover:shadow-lg transition duration-300 font-medium"
-                        >
-                            Register
-                        </button>
-                        <Link to="/"><button className='w-full bg-red-700 text-white py-3 rounded-md hover:bg-red-800 hover:shadow-lg transition duration-300 font-medium'>
-                            Go Back
-                            </button>
-                        </Link>
-                    </div>
-                </form>
+                                    Register
+                                </Button>
+                                <Link to="/" className="order-2 md:order-1">
+                                    <Button
+                                        className='w-full bg-red-700 text-white hover:bg-red-800 font-medium rounded-lg py-2 transition-all duration-300 hover:shadow-red-500/20'
+                                        size="lg"
+                                    >
+                                        Go Back
+                                    </Button>
+                                </Link>
+                            </div>
+                        </form>
+                    </CardBody>
+                </Card>
             </div>
         </div>
     );

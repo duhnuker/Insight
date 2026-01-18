@@ -9,6 +9,8 @@ import userHome from "./routes/userHome.js";
 import profile from "./routes/profile.js";
 import resumeBuilder from "./routes/resumeBuilder.js";
 import { createClient } from '@supabase/supabase-js';
+import redisClient from "./redisClient.js";
+
 
 
 const app = express();
@@ -57,3 +59,13 @@ app.use("/api/resumeBuilder", resumeBuilder);
 app.listen(Number(PORT), '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+// Database keep-alive to prevent Supabase hibernation
+setInterval(async () => {
+    try {
+        await pool.query('SELECT 1');
+        console.log('Keep-alive query successful');
+    } catch (err) {
+        console.error('Keep-alive query failed:', err);
+    }
+}, 12 * 60 * 60 * 1000);
