@@ -283,13 +283,14 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
                                                 selectedKeys={activeExp.startMonth ? [activeExp.startMonth] : []}
                                                 onSelectionChange={(keys) => setActiveExp({ ...activeExp, startMonth: Array.from(keys)[0] as string })}
                                                 classNames={{
-                                                    trigger: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 rounded-lg h-14",
+                                                    trigger: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 group-data-[focus=true]:border-emerald-500/80 rounded-lg h-14 transition-all duration-300 shadow-lg",
                                                     value: "text-white",
-                                                    popoverContent: "bg-zinc-900 border border-white/10 text-white"
+                                                    popoverContent: "bg-zinc-900 border border-white/10 text-white",
+                                                    listbox: "p-2 max-h-[250px] overflow-y-auto"
                                                 }}
                                             >
                                                 {months.map((month) => (
-                                                    <SelectItem key={month} className="text-white">
+                                                    <SelectItem key={month} className="text-white data-[hover=true]:bg-emerald-500/20 transition-colors cursor-pointer pl-6">
                                                         {month}
                                                     </SelectItem>
                                                 ))}
@@ -300,8 +301,8 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
                                                 onChange={(e) => setActiveExp({ ...activeExp, startYear: e.target.value })}
                                                 maxLength={4}
                                                 classNames={{
-                                                    input: "text-white h-full",
-                                                    inputWrapper: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 rounded-lg h-14"
+                                                    input: "text-white focus:outline-none h-full",
+                                                    inputWrapper: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 group-data-[focus=true]:border-emerald-500/80 rounded-lg h-14 transition-all duration-300 shadow-lg"
                                                 }}
                                                 size="lg"
                                             />
@@ -314,13 +315,14 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
                                                         selectedKeys={activeExp.endMonth ? [activeExp.endMonth] : []}
                                                         onSelectionChange={(keys) => setActiveExp({ ...activeExp, endMonth: Array.from(keys)[0] as string })}
                                                         classNames={{
-                                                            trigger: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 rounded-lg h-14",
+                                                            trigger: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 group-data-[focus=true]:border-emerald-500/80 rounded-lg h-14 transition-all duration-300 shadow-lg",
                                                             value: "text-white",
-                                                            popoverContent: "bg-zinc-900 border border-white/10 text-white"
+                                                            popoverContent: "bg-zinc-900 border border-white/10 text-white",
+                                                            listbox: "p-2 max-h-[250px] overflow-y-auto"
                                                         }}
                                                     >
                                                         {months.map((month) => (
-                                                            <SelectItem key={month} className="text-white">
+                                                            <SelectItem key={month} className="text-white data-[hover=true]:bg-emerald-500/20 transition-colors cursor-pointer pl-6">
                                                                 {month}
                                                             </SelectItem>
                                                         ))}
@@ -331,8 +333,8 @@ const Register = ({ setAuth }: { setAuth: (auth: boolean) => void }) => {
                                                         onChange={(e) => setActiveExp({ ...activeExp, endYear: e.target.value })}
                                                         maxLength={4}
                                                         classNames={{
-                                                            input: "text-white h-full",
-                                                            inputWrapper: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 rounded-lg h-14"
+                                                            input: "text-white focus:outline-none h-full",
+                                                            inputWrapper: "bg-zinc-800/50 border border-white/10 hover:border-emerald-500/50 group-data-[focus=true]:border-emerald-500/80 rounded-lg h-14 transition-all duration-300 shadow-lg"
                                                         }}
                                                         size="lg"
                                                     />

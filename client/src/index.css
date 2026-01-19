@@ -14,4 +14,27 @@
         background-color: transparent !important;
         transition: background-color 5000s ease-in-out 0s;
     }
+
+    /* Custom Draggable Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(16, 185, 129, 0.2);
+        border-radius: 20px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(16, 185, 129, 0.5);
+        border: 2px solid transparent;
+        background-clip: content-box;
+    }
 }
