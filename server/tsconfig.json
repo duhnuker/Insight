@@ -8,6 +8,10 @@
     "rootDir": "./src",
     "strict": true,
     "allowJs": true,
-    "allowSyntheticDefaultImports": true
-  }
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "node_modules"
+  ]
 }
