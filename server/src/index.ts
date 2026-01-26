@@ -50,6 +50,16 @@ export const supabase = createClient(
     process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+app.get("/health", async (req, res) => {
+    try {
+        await pool.query('SELECT 1');
+        res.status(200).send("OK");
+    } catch (err) {
+        console.error("Health check failed:", err);
+        res.status(500).send("Database connection error");
+    }
+});
+
 app.use("/auth", jwtAuth);
 app.use("/api/landing", landing);
 app.use("/api/userhome", userHome);
@@ -60,12 +70,3 @@ app.listen(Number(PORT), '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}`);
 });
 
-// Database keep-alive to prevent Supabase hibernation
-setInterval(async () => {
-    try {
-        await pool.query('SELECT 1');
-        console.log('Keep-alive query successful');
-    } catch (err) {
-        console.error('Keep-alive query failed:', err);
-    }
-}, 12 * 60 * 60 * 1000);
