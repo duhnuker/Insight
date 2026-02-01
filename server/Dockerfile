@@ -4,7 +4,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN apk add --no-available --sync --no-cache python3 make g++ && \
+RUN apk add --no-cache python3 make g++ && \
     npm install
 
 COPY . .
