@@ -8,20 +8,41 @@ The application follows a standard Client-Server architecture with a segregated 
 ```mermaid
 graph TD
     User[User] --> Client["Client (React + Vite)"]
-    Client <-->|"API Requests (JSON + Bearer Token)"| Server["Server (Node.js + Express)"]
     
-    subgraph "Backend Services"
-        Server <-->|"Auth/Data Queries"| DB[("Supabase PostgreSQL")]
-        Server <-->|"Local Inference (Job Matching)"| AI["AI Engine (Transformers.js)"]
-        Server <-->|"Caching"| Redis[("Redis")]
+    subgraph "Dockerized Environment"
+        subgraph "Frontend Container (Nginx)"
+            Client
+        end
+
+        subgraph "Backend Container (Node.js)"
+            Server["Server (Node.js + Express)"]
+            AI["AI Engine (Transformers.js)"]
+            Server <--> AI
+        end
+
+        subgraph "Cache Container"
+            Redis[("Redis")]
+        end
+
+        Client <-->|"API Requests"| Server
+        Server <-->|"Caching"| Redis
     end
     
-    subgraph External
+    subgraph "External Services"
+        Server <-->|"Auth/Data"| DB[("Supabase PostgreSQL")]
         Server <-.->|"Search (Jobs)"| Adzuna["Adzuna API"]
     end
 ```
 
-## 2. Technology Stack
+## 2. Infrastructure & Deployment
+The application is fully containerized using **Docker**, ensuring consistency across development and production environments.
+
+- **Orchestration**: `docker-compose` for local development.
+- **Frontend**: Served via Nginx in a lightweight Alpine-based container.
+- **Backend**: Debian-slim based container (to support ONNX Runtime/AI dependencies).
+- **Environment Management**: Separation of development (`.env.local`) and production secrets.
+
+## 3. Technology Stack
 
 ### Frontend (Client)
 - **Framework**: React (v18) with Vite for build tooling.
@@ -46,7 +67,7 @@ graph TD
     - `users`: Stores user credentials and profile data.
     - `profile`: Stores user skills and experience for matching.
 
-## 3. Core Components & Responsibilities
+## 4. Core Components & Responsibilities
 
 ### Authentication System
 - **Custom Implementation**: Uses `bcrypt` for secure password hashing and `jsonwebtoken` for stateless session management.
@@ -71,7 +92,7 @@ graph TD
 - Unlike traditional setups calling external OpenAI APIs, this project runs a quantized `distilbert` model *inside* the Node.js process using `@xenova/transformers`.
 - **Benefit**: Zero latency overhead for network calls to AI providers; privacy-preserving (data stays on server).
 
-## 4. Data Flow Example: Generating Job Recommendations
+## 5. Data Flow Example: Generating Job Recommendations
 
 1. **Client**: User navigates to the Dashboard.
 2. **Client**: Sends `GET /user-home` with Bearer Token.
