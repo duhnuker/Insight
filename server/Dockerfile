@@ -1,20 +1,31 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 
 WORKDIR /app
 
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY package*.json ./
-RUN apk add --no-cache python3 make g++ && \
-    npm install
+RUN npm install
 
 COPY . .
 RUN npm run build
 RUN npm prune --production
 
 # Production stage
-FROM node:20-alpine
+FROM node:20-slim
 
 WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
