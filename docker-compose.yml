@@ -1,0 +1,30 @@
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./server/.env
+    # To use the local redis container, ensure REDIS_URL in ./server/.env 
+    # is set to: redis://redis:6379
+    depends_on:
+      - redis
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:5000
+    ports:
+      - "8080:80"
+    depends_on:
+      - server
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    restart: always
